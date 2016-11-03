@@ -1,0 +1,6 @@
+# Field number, z bin number, mean, shift, field type, zmin, zmax
+# Types: 1-galaxies 2-shear
+
+     1      1   0.0000   0.7170      1   0.2000   0.4500
+     2      1   0.0000   0.0164      2   0.2000   0.4500
+     2      2   0.0000   0.0228      2   0.0000   1.0000
