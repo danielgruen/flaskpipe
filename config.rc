@@ -12,8 +12,9 @@ MASK=msum.fits.gz # Y1A1 redmagic high density up to 0.45, cookie-cut 8 times
 
 # tracer density (unmasked) per arcmin^2
 DENSITY=0.044 # redMaGiC, z=0.2..0.45, unmasked
+BIAS=1.5
 
 # path to flask executable
-FLASK=/u/ki/dgruen/flask-master/bin/flask
+FLASK=/u/ki/dgruen/flask/bin/flask
 
 
