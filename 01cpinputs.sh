@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source /u/ki/dgruen/trough_flask/config.rc
+source /u/ki/dgruen/work/trough_flask/config.rc
 
 if [ $# -ne 1 ]
 then

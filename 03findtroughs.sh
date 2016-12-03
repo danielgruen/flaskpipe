@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source /u/ki/dgruen/trough_flask/config.rc
+source /u/ki/dgruen/work/trough_flask/config.rc
 
 if [ $# -ne 1 ]
 then
@@ -10,4 +10,4 @@ fi
 
 cd $WORK/tf$1/$RUN
 
-source /u/ki/dgruen/trough_flask/trough_helpers/do_it_all.sh 
+source $PREFIX/trough_helpers/do_it_all.sh 
