@@ -45,7 +45,7 @@ helpers="$PREFIX/trough_helpers/"
  echo "(2.1) generate count healpix map from tracer catalog"
  for theta in $countradii
  do
-    if [ ! -f $base/trough_${theta}_count.fits ]
+    if [ ! -f $base/trough_${theta}_count.fits* ]
     then
       echo $helpers/count_in_trough $base/tracers.txt $theta $base/trough_${theta}_count.fits
       $helpers/count_in_trough $base/tracers.txt $theta $base/trough_${theta}_count.fits
@@ -61,10 +61,10 @@ helpers="$PREFIX/trough_helpers/"
  do
   for theta in $countradii
   do
-    if [ ! -f $base/trough_${theta}_${i}_0.fits ]
+    if [ ! -f $base/trough_${theta}_${i}_0.fits* ]
     then
-      echo $helpers/troughfinder $base/trough_${theta}_count.fits $PREFIX/m${i}_${theta}.fits.gz ${count_maxmaskfrac} $base/trough_${theta}_$i $countpercentiles
-      $helpers/troughfinder $base/trough_${theta}_count.fits $PREFIX/m${i}_${theta}.fits.gz ${count_maxmaskfrac} \
+      echo $helpers/troughfinder $base/trough_${theta}_count.fits* $PREFIX/m${i}_${theta}.fits.gz ${count_maxmaskfrac} $base/trough_${theta}_$i $countpercentiles
+      $helpers/troughfinder $base/trough_${theta}_count.fits* $PREFIX/m${i}_${theta}.fits.gz ${count_maxmaskfrac} \
                             $base/trough_${theta}_$i $countpercentiles &> $base/trough_${theta}_${i}.log
     fi
   done
@@ -80,8 +80,8 @@ helpers="$PREFIX/trough_helpers/"
   do
     if [ ! -s $base/pofn_${theta}_$i.tab ]
     then
-      echo $helpers/pofn_bernoulli $base/trough_${theta}_count.fits ${PREFIX}/m${i}_${theta}.fits.gz ${count_maxmaskfrac} 
-      $helpers/pofn_bernoulli $base/trough_${theta}_count.fits ${PREFIX}/m${i}_${theta}.fits.gz \
+      echo $helpers/pofn_bernoulli $base/trough_${theta}_count.fits* ${PREFIX}/m${i}_${theta}.fits.gz ${count_maxmaskfrac} 
+      $helpers/pofn_bernoulli $base/trough_${theta}_count.fits* ${PREFIX}/m${i}_${theta}.fits.gz \
                              ${count_maxmaskfrac}  > $base/pofn_${theta}_${i}.tab
     fi
   done
@@ -102,8 +102,8 @@ helpers="$PREFIX/trough_helpers/"
    do
       if [ ! -s $base/gammat_${m}_${theta}_${s}_$i.tab ]
       then
-        echo python ${PREFIX}/measure_gammat.py $base/trough_${theta}_${i}_${s}.fits $base/kappa-gamma-${m}.fits $PREFIX/m${i}.fits.gz $base/gammat_${m}_${theta}_${s}_$i.tab
-        python ${PREFIX}/measure_gammat.py $base/trough_${theta}_${i}_${s}.fits $base/kappa-gamma-${m}.fits $PREFIX/m${i}.fits.gz $base/gammat_${m}_${theta}_${s}_$i.tab &> gammat_${m}_${theta}_${s}_${i}.log
+        echo python ${PREFIX}/measure_gammat.py $base/trough_${theta}_${i}_${s}.fits* $base/kappa-gamma-${m}.fits* $PREFIX/m${i}.fits.gz $base/gammat_${m}_${theta}_${s}_$i.tab
+        python ${PREFIX}/measure_gammat.py $base/trough_${theta}_${i}_${s}.fits* $base/kappa-gamma-${m}.fits* $PREFIX/m${i}.fits.gz $base/gammat_${m}_${theta}_${s}_$i.tab &> gammat_${m}_${theta}_${s}_${i}.log
       fi
     done
    done
@@ -123,8 +123,8 @@ helpers="$PREFIX/trough_helpers/"
    do
       if [ ! -s $base/gammat_shapenoise_${theta}_${s}_$i.tab ]
       then
-        echo python ${PREFIX}/measure_gammat_shapenoise.py $base/trough_${theta}_${i}_${s}.fits 0.037 ${PREFIX}/m${i}.fits.gz $base/gammat_shapenoise_${theta}_${s}_$i.tab ${1}$i
-        python ${PREFIX}/measure_gammat_shapenoise.py $base/trough_${theta}_${i}_${s}.fits 0.037 ${PREFIX}/m${i}.fits.gz $base/gammat_shapenoise_${theta}_${s}_$i.tab ${1}$i
+        echo python ${PREFIX}/measure_gammat_shapenoise.py $base/trough_${theta}_${i}_${s}.fits* 0.037 ${PREFIX}/m${i}.fits.gz $base/gammat_shapenoise_${theta}_${s}_$i.tab ${1}$i
+        python ${PREFIX}/measure_gammat_shapenoise.py $base/trough_${theta}_${i}_${s}.fits* 0.037 ${PREFIX}/m${i}.fits.gz $base/gammat_shapenoise_${theta}_${s}_$i.tab ${1}$i
       fi
    done
    done

@@ -1,18 +1,20 @@
+source /u/ki/dgruen/.bash_profile
+
 # prefix with all the files to use
-PREFIX=/u/ki/dgruen/trough_flask
+PREFIX=/u/ki/dgruen/work/trough_flask
 
 # work directory parent dir for flask
 WORK=/scratch/dgruen
 
 # run name (prefix for flask config, Cl, p(z) files)
-RUN=example
+RUN=oliver
 
 # healpix mask (same nside as output according to config)
 MASK=msum.fits.gz # Y1A1 redmagic high density up to 0.45, cookie-cut 8 times
 
 # tracer density (unmasked) per arcmin^2
 DENSITY=0.044 # redMaGiC, z=0.2..0.45, unmasked
-BIAS=1.5
+BIAS=1.55
 
 # path to flask executable
 FLASK=/u/ki/dgruen/flask/bin/flask

@@ -15,7 +15,7 @@ using namespace std;
 int main(int argc, char **argv)
 {
   if(argc!=5) {
-    cerr << "syntax: " << argv[0] << " [input catalog] [RA col] [DEC col] [mask]" << endl;
+    cerr << "syntax: " << argv[0] << " [input catalog] [phi col] [theta col] [mask]" << endl;
     return 1;
   }
 
@@ -26,6 +26,7 @@ int main(int argc, char **argv)
   cerr << "// read input catalog" << endl;
   ObjectCollection input(argv[1], 1, columns);
   cerr << "// input size:" << input.size() << endl;
+  cerr << "// input header:" << *(input.prototype) << endl;
 
   cerr << "// read FITS mask" << endl;
   Healpix_Map<double> map(4,RING);
@@ -34,10 +35,12 @@ int main(int argc, char **argv)
 
   for(int i=0; i<input.size(); i++)
   {
-        double ra=input[i]->doublePropertyValue(argv[2]);
-        double dec=input[i]->doublePropertyValue(argv[3]);
+        double phi=input[i]->doublePropertyValue(argv[2]);
+        double theta=input[i]->doublePropertyValue(argv[3]);
+        double ra=phi;
+        double dec=90.-theta;
 
-        const pointing ang(M_PI/2.0 - dec*M_PI/180., ra*M_PI/180.);
+        const pointing ang(theta*M_PI/180., phi*M_PI/180.);
         int j = map.ang2pix(ang);
         double p = map[j];
 
@@ -45,7 +48,7 @@ int main(int argc, char **argv)
         {
           cout << ra << " " << dec << endl;
         }
-        else if(rand()%1000==0) {
+        else if(rand()%100000==0) {
           cerr << "warning: mask at " << ra << " " << dec << " is zero; object skipped" << endl;
         }
   }
