@@ -34,5 +34,10 @@ echo gunzip $scratchdir/$MASK
 gunzip $scratchdir/$MASK
 echo mv $scratchdir/`basename $MASK .gz` $scratchdir/${RUN}mask-f1z1.fits
 mv $scratchdir/`basename $MASK .gz` $scratchdir/${RUN}mask-f1z1.fits
+# ln for remaining galaxy fields, the dirty way
+for i in 2 3 4 5 6 7 8 9
+do
+  ln -s $scratchdir/${RUN}mask-f1z1.fits $scratchdir/${RUN}mask-f1z${i}.fits
+done
 
 

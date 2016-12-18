@@ -23,8 +23,9 @@ echo $FLASK ${RUN}.config  \
        SELEC_SCALE: $DENSITY \
        NSIDE: $NSIDE  \
        SHEAR_LMAX: $NSIDE \
+       LRANGE: 2 $LMAX \
        MAP_OUT: 0 \
-       MAPFITS_PREFIX: 0 \
+       MAPFITS_PREFIX: $RUN/matter- \
        RECOVCLS_OUT: 0 \
        SHEAR_FITS_PREFIX: $RUN/kappa-gamma- \
        MAPWERFITS_PREFIX: 0 \
@@ -42,8 +43,9 @@ $FLASK ${RUN}.config  \
        SELEC_SCALE: $DENSITY \
        NSIDE: $NSIDE  \
        SHEAR_LMAX: $NSIDE \
+       LRANGE: 2 $LMAX \
        MAP_OUT: 0 \
-       MAPFITS_PREFIX: 0 \
+       MAPFITS_PREFIX: $RUN/map- \
        RECOVCLS_OUT: 0 \
        SHEAR_FITS_PREFIX: $RUN/kappa-gamma- \
        MAPWERFITS_PREFIX: 0 \

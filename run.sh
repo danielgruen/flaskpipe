@@ -1,10 +1,12 @@
+#!/bin/bash
 # change this to reflect path to flaskpipe
 d=/u/ki/dgruen/work/flaskpipe
 
 if [ $# -ne 1 ]
 then
   echo "syntax: run.sh ID"
-  echo "where ID is a run number (used as a random seed and for saving outputs)
+  echo "where ID is a run number (used as a random seed and for saving outputs)"
+  exit 1
 fi
 
 echo --------------------------------- bash $d/01cpinputs.sh $1 $d

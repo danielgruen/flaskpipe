@@ -15,17 +15,17 @@ src=$WORK/fp_${RUN}_$1/$RUN
 dest=$SAVEDIR/${RUN}_$1
 mkdir -p $dest
 
-cp $src/pofn*.tab $dest
-cp $src/gammat*.tab $dest
-cp $src/trough*.fits $dest
-
 # save Poisson-sampled tracer catalogs
 cp $src/catalog.fits $dest
 
 # save lensing maps after masking / zipping
 for i in $src/kappa-gamma-f?z?.fits
 do
-python $PREFIX/mask_maps.py $i $PREFIX/$MASK $dest/`basename $i .fits`.fits.gz
+python $PREFIX/mask_maps.py $i $PREFIX/$MASK 3 $dest/`basename $i .fits`.fits.gz
+done
+for i in $src/map-f?z?.fits
+do
+python $PREFIX/mask_maps.py $i $PREFIX/$MASK 1 $dest/`basename $i .fits`.fits.gz
 done
 
 # zip whichever fits might not be zipped yet
