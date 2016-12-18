@@ -1,13 +1,14 @@
 #!/bin/bash
 
-source /u/ki/dgruen/work/trough_flask/config.rc
 
-if [ $# -ne 1 ]
+if [ $# -ne 2 ]
 then
- echo "syntax: $0 ID" 
+ echo "syntax: $0 ID FLASKPIPE_DIR" 
  exit 1
 fi
 
-cd $WORK/tf$1/$RUN
+source $2/config.rc
+
+cd $WORK/fp_${RUN}_$1/$RUN
 
 source $PREFIX/trough_helpers/do_it_all.sh 

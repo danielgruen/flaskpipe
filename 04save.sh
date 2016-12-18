@@ -1,30 +1,38 @@
 #!/bin/bash
 
-source /u/ki/dgruen/work/trough_flask/config.rc
 
-if [ $# -ne 1 ]
+if [ $# -ne 2 ]
 then
- echo "syntax: $0 ID" 
+ echo "syntax: $0 ID FLASKPIPE_DIR" 
  exit 1
 fi
 
-DESDIR=/nfs/slac/g/ki/ki23/des/troughs
-
-mkdir -p $DESDIR/flask/${RUN}$1
-
-cp $WORK/tf$1/$RUN/pofn*.tab $DESDIR/flask/${RUN}$1
-cp $WORK/tf$1/$RUN/gammat*.tab $DESDIR/flask/${RUN}$1
-cp $WORK/tf$1/$RUN/catalog.fits $DESDIR/flask/${RUN}$1
-cp $WORK/tf$1/$RUN/trough*.fits $DESDIR/flask/${RUN}$1
+source $2/config.rc
 
 
-python $PREFIX/mask_maps.py $WORK/tf$1/$RUN/kappa-gamma-f2z1.fits $PREFIX/$MASK $DESDIR/flask/${RUN}$1/kappa-gamma-f2z1.fits.gz
-python $PREFIX/mask_maps.py $WORK/tf$1/$RUN/kappa-gamma-f2z2.fits $PREFIX/$MASK $DESDIR/flask/${RUN}$1/kappa-gamma-f2z2.fits.gz
+src=$WORK/fp_${RUN}_$1/$RUN
 
+dest=$SAVEDIR/${RUN}_$1
+mkdir -p $dest
 
-for i in $DESDIR/flask/${RUN}$1/*.fits
+cp $src/pofn*.tab $dest
+cp $src/gammat*.tab $dest
+cp $src/trough*.fits $dest
+
+# save Poisson-sampled tracer catalogs
+cp $src/catalog.fits $dest
+
+# save lensing maps after masking / zipping
+for i in $src/kappa-gamma-f?z?.fits
+do
+python $PREFIX/mask_maps.py $i $PREFIX/$MASK $dest/`basename $i .fits`.fits.gz
+done
+
+# zip whichever fits might not be zipped yet
+for i in $dest/*.fits
 do
   gzip $i
 done
 
-rm -rf $WORK/tf$1
+# clean up scratch directory
+rm -rf $WORK/fp_${RUN}_$1/

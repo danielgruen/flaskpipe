@@ -1,14 +1,14 @@
 #!/bin/bash
 
-source /u/ki/dgruen/work/trough_flask/config.rc
 
-if [ $# -ne 1 ]
+if [ $# -ne 2 ]
 then
- echo "syntax: $0 ID" 
+ echo "syntax: $0 ID FLASKPIPE_DIR" 
  exit 1
 fi
+source $2/config.rc
 
-cd $WORK/tf$1
+cd $WORK/fp_${RUN}_$1
 mkdir -p $RUN
 
 echo $FLASK ${RUN}.config  \
