@@ -5,24 +5,16 @@ source /u/ki/dgruen/.bash_profile
 PREFIX=/u/ki/dgruen/work/flaskpipe
 
 # work directory parent dir for flask, something like your scratch base dir
-WORK=/u/ki/dgruen/tmp
+WORK=/scratch/dgruen
 
 # run name (prefix for flask config, Cl, p(z) files)
-RUN=example
-
-# healpix mask (same nside as output according to config)
-MASK=msum256.fits.gz    # full mask with multiple realizations of footprint 
-COOKIEMASKPREFIX=m256_ # expect individual cookies in ${COOKIEMASKPREFIX}[12345...].fits.gz
-NCOOKIES=8
+RUN=sdss
 
 # NSIDE of mask and output maps; also max ell
-NSIDE=256 # quick job for testing
-LMAX=500  # maximum ell in input tables (should be >=NSIDE)
-
-# tracer density (unmasked) per arcmin^2, one per f1zX matter density field
-DENSITY=("0.04" "0.04") # I just made these up
-# tracer bias, one per f1zX matter density field
-BIAS=("1.3" "1.7")
+#NSIDE=4096 # quick job for testing
+#LMAX=10000  # maximum ell in input tables (should be >=NSIDE)
+NSIDE=256
+LMAX=1000
 
 # path to flask executable
 FLASK=/u/ki/dgruen/flask/bin/flask
@@ -31,4 +23,4 @@ FLASK=/u/ki/dgruen/flask/bin/flask
 PYTHON=/u/ki/dgruen/anaconda2/bin/python
 
 # directory to save results in in the end (will be in subdirectories $RUN_$ID)
-SAVEDIR=/u/ki/dgruen/work/flaskpipe/output
+SAVEDIR=/nfs/slac/g/ki/ki23/des/flaskpipe/output/

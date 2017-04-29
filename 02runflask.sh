@@ -8,6 +8,8 @@ then
 fi
 source $2/config.rc
 
+echo "02RUNFLASK..............."
+
 cd $WORK/fp_${RUN}_$1
 mkdir -p $RUN
 
@@ -29,7 +31,7 @@ echo $FLASK ${RUN}.config  \
        RECOVCLS_OUT: 0 \
        SHEAR_FITS_PREFIX: $RUN/kappa-gamma- \
        MAPWERFITS_PREFIX: 0 \
-       CATALOG_OUT: $RUN/catalog.fits &> $RUN/flask.log 
+       CATALOG_OUT: $RUN/catalog.fits  
 
 $FLASK ${RUN}.config  \
        RNDSEED: $1    \
@@ -49,5 +51,5 @@ $FLASK ${RUN}.config  \
        RECOVCLS_OUT: 0 \
        SHEAR_FITS_PREFIX: $RUN/kappa-gamma- \
        MAPWERFITS_PREFIX: 0 \
-       CATALOG_OUT: $RUN/catalog.fits &> $RUN/flask.log 
+       CATALOG_OUT: $RUN/catalog.fits
 

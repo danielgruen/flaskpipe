@@ -14,13 +14,13 @@ lens=healpy.read_map(sys.argv[1])
 lensnside=healpy.npix2nside(len(lens))
 lensid=np.arange(len(lens))[lens>0]
 weight=lens[lens>0]
-lens=0
+#lens=0
 ltheta,lphi=healpy.pix2ang(lensnside,lensid)
-lensid=0
+#lensid=0
 lra=  np.degrees(lphi)
 ldec= np.degrees(pi/2.-ltheta)
-ltheta=0
-lphi=0
+#ltheta=0
+#lphi=0
 print("read",len(lra),"lenses in ra=",np.amin(lra),np.amax(lra),"dec=",np.amin(ldec),np.amax(ldec))
 
 

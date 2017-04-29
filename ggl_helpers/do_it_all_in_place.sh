@@ -15,7 +15,7 @@ tracers_thetacol="dec" # yes, this is a confusing convention in flask
 tracers_phicol="ra"
 
 mask_nside=4096
-ncookie=8 # number of cookies cut
+ncookie=$NCOOKIES # number of cookies cut
 
 # (1b) setting for trough catalog
 
@@ -63,8 +63,8 @@ helpers="$PREFIX/trough_helpers/"
    do
       if [ ! -s $base/gammat_${m}_tracers_$i.tab ]
       then
-        echo python ${PREFIX}/measure_gammat.py $base/trough_0_count.fits* $base/kappa-gamma-${m}.fits* $PREFIX/m${i}.fits.gz $base/gammat_${m}_tracers_$i.tab
-        python ${PREFIX}/measure_gammat.py $base/trough_0_count.fits* $base/kappa-gamma-${m}.fits* $PREFIX/m${i}.fits.gz $base/gammat_${m}_tracers_$i.tab
+        echo python ${PREFIX}/measure_gammat.py $base/trough_0_count.fits* $base/kappa-gamma-${m}.fits* $PREFIX/$COOKIEMASKPREFIX${i}.fits.gz $base/gammat_${m}_tracers_$i.tab
+        python ${PREFIX}/measure_gammat.py $base/trough_0_count.fits* $base/kappa-gamma-${m}.fits* $PREFIX/$COOKIEMASKPREFIX${i}.fits.gz $base/gammat_${m}_tracers_$i.tab
       fi
    done
  done
@@ -78,8 +78,8 @@ helpers="$PREFIX/trough_helpers/"
    do
       if [ ! -s $base/gammat_shapenoise_tracers_$i.tab ]
       then
-        echo python ${PREFIX}/measure_gammat_shapenoise.py $base/trough_0_count.fits* 0.037 ${PREFIX}/m${i}.fits.gz $base/gammat_shapenoise_tracers_$i.tab ${1}$i
-        python ${PREFIX}/measure_gammat_shapenoise.py $base/trough_0_count.fits* 0.037 ${PREFIX}/m${i}.fits.gz $base/gammat_shapenoise_tracers_$i.tab ${1}$i
+        echo python ${PREFIX}/measure_gammat_shapenoise.py $base/trough_0_count.fits* 0.037 ${PREFIX}/$COOKIEMASKPREFIX${i}.fits.gz $base/gammat_shapenoise_tracers_$i.tab ${1}$i
+        python ${PREFIX}/measure_gammat_shapenoise.py $base/trough_0_count.fits* 0.037 ${PREFIX}/$COOKIEMASKPREFIX${i}.fits.gz $base/gammat_shapenoise_tracers_$i.tab ${1}$i
       fi
    done
 ##########################

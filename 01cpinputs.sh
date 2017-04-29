@@ -7,6 +7,9 @@ then
  exit 1
 fi
 source $2/config.rc
+source $2/config_${RUN}.rc
+
+echo "01CPINPUTS..............."
 
 # (1) make scratch directory
 scratchdir=$WORK/fp_${RUN}_$1
