@@ -7,6 +7,7 @@ then
  exit 1
 fi
 source $2/config.rc
+source $2/config_${RUN}.rc
 
 echo "02RUNFLASK..............."
 

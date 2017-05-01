@@ -8,6 +8,7 @@ then
 fi
 
 source $2/config.rc
+source $2/config_${RUN}.rc
 
 echo "03FINDTROUGHS................."
 
