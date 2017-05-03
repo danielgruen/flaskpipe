@@ -27,8 +27,8 @@ echo $PYTHON $PREFIX/flask_bias_cl.py ${RUN}-info.dat ${RUN}Cl- ${BIAS[*]} $scra
 $PYTHON $PREFIX/flask_bias_cl.py ${RUN}-info.dat ${RUN}Cl- ${BIAS[*]} $scratchdir/${RUN}Cl-
 
 # (4) copy n(z) files
-echo cp $PREFIX/${RUN}pz-f?.dat  $scratchdir
-cp $PREFIX/${RUN}pz-f?.dat  $scratchdir
+#echo cp $PREFIX/${RUN}pz-f?.dat  $scratchdir
+#cp $PREFIX/${RUN}pz-f?.dat  $scratchdir
 
 # (5) copy survey mask; this assumes it's the same mask for all fields
 echo cp $PREFIX/$MASK $scratchdir
@@ -37,10 +37,4 @@ echo gunzip $scratchdir/$MASK
 gunzip $scratchdir/$MASK
 echo mv $scratchdir/`basename $MASK .gz` $scratchdir/${RUN}mask-f1z1.fits
 mv $scratchdir/`basename $MASK .gz` $scratchdir/${RUN}mask-f1z1.fits
-# ln for remaining galaxy fields, the dirty way
-for i in 2 3 4 5 6 7 8 9
-do
-  ln -s $scratchdir/${RUN}mask-f1z1.fits $scratchdir/${RUN}mask-f1z${i}.fits
-done
-
-
+# this does not allow for more than one trough redshift range, but hey

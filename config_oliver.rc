@@ -1,0 +1,20 @@
+# count config
+countradii="10 20 30" # radii (arcmin) used
+countpercentiles="0.2 0.4 0.6 0.8"  # lower percentile for trough selection
+percentilekeys="0 1 2 3 4 troughmask" # suffixes for measuring shear around 
+count_maxmaskfrac="0.2"
+
+# healpix mask (same nside as output according to config)
+#MASK=msum256.fits.gz    # full mask with multiple realizations of footprint 
+#COOKIEMASKPREFIX=m256_ # expect individual cookies in ${COOKIEMASKPREFIX}[12345...].fits.gz
+MASK=mask_buzzard_sum.fits.gz    # full mask with multiple realizations of footprint 
+COOKIEMASKPREFIX=mask_buzzard_c # expect individual cookies in ${COOKIEMASKPREFIX}[12345...].fits.gz
+NCOOKIES=14
+
+
+# tracer density (unmasked) per arcmin^2, one per f1zX matter density field
+DENSITY=("0.044") # redMaGiC
+# tracer bias, one per f1zX matter density field
+BIAS=("1.54")
+
+

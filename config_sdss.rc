@@ -1,0 +1,21 @@
+# count config
+countradii="10 20" # radii (arcmin) used
+countradius=20 # the one used for kappa_0, theta_0
+countpercentiles="0.2 0.4 0.6 0.8"  # lower percentile for trough selection
+percentilekeys="0 1 2 3 4 troughmask" # suffixes for measuring shear around 
+count_maxmaskfrac="0.1"
+goodfrac="0.9"
+
+# healpix mask (same nside as output according to config)
+MASK=mask_sdss_sum.fits.gz   # full mask with multiple realizations of footprint 
+COOKIEMASKPREFIX=mask_sdss 
+# expect individual cookies in ${COOKIEMASKPREFIX}_c[12345...].fits.gz
+# expect individual cookie shape weight mask in ${COOKIEMASKPREFIX}_c[12345...]_s[12...].fits.gz
+NCOOKIES=1
+NSOURCEBINS=1
+
+# tracer density (unmasked) per arcmin^2, one per f1zX matter density field
+DENSITY=("0.04377") # SDSS, redMaGiC, z=0.2..0.45, 10' and 20' doesn't matter, corrected for 10 per-cent masking
+# tracer bias, one per f1zX matter density field
+BIAS=("1.54")
+

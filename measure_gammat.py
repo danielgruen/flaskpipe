@@ -2,7 +2,7 @@ import treecorr
 import sys
 import healpy
 import numpy as np
-from math import pi
+from math import pi,sqrt
 
 if(len(sys.argv)!=5):
   print("syntax:",sys.argv[0],"[lens map] [flask shear map] [lensing source mask] [output file]")
@@ -29,19 +29,28 @@ shearmask=healpy.read_map(sys.argv[3])
 shear1= -healpy.read_map(sys.argv[2],1)[shearmask>0]
 shear2=  healpy.read_map(sys.argv[2],2)[shearmask>0]
 shearnside=healpy.npix2nside(len(shearmask))
+print("shear_nside=",shearnside)
 shearid=np.arange(len(shearmask))[shearmask>0]
+shearweight=shearmask[shearmask>0]
+soffset=sqrt(healpy.nside2pixarea(healpy.npix2nside(len(shearmask)),degrees=True)) # pixel width in deg
 shearmask=0
 stheta,sphi=healpy.pix2ang(shearnside,shearid)
 shearid=0
 sra=np.degrees(sphi)
 sdec=np.degrees(pi/2.-stheta)
+
+# randomize source positions a tiny bit
+sra = sra + np.random.uniform(low=-soffset/2., high=+soffset/2.)/np.cos(sdec*pi/180.)
+sdec = sdec + np.random.uniform(low=-soffset/2., high=+soffset/2.)
+
+
 stheta=0
 sphi=0
 print("read",len(sra),"sources in ra=",np.amin(sra),np.amax(sra),"dec=",np.amin(sdec),np.amax(sdec))
 
 
 lens_cat = treecorr.Catalog(ra=lra, dec=ldec, ra_units='degrees', dec_units='degrees', w=weight)
-src_cat = treecorr.Catalog(ra=sra, dec=sdec,
+src_cat = treecorr.Catalog(ra=sra, dec=sdec, w=shearweight,
                                g1=shear1, g2=shear2,
                                ra_units='degrees', dec_units='degrees')
 
@@ -50,7 +59,7 @@ src_cat = treecorr.Catalog(ra=sra, dec=sdec,
 thmin = 5.
 thmax = 600.
 nth   = 24
-bslop = 0.2
+bslop = 0.1
 #####################
 
 ng = treecorr.NGCorrelation(nbins = nth, min_sep = thmin, max_sep = thmax,

@@ -14,8 +14,8 @@ for t in $countradii
 do
 if [ ! -f ${COOKIEMASKPREFIX}_c${i}_${t}.fits.gz ]
 then
-echo ./trough_helpers/smooth_map ${COOKIEMASKPREFIX}$i.fits.gz $t 1024 ${COOKIEMASKPREFIX}${i}_${t}.fits.gz
-./trough_helpers/smooth_map ${COOKIEMASKPREFIX}$i.fits.gz $t 1024 ${COOKIEMASKPREFIX}${i}_${t}.fits.gz
+echo ./trough_helpers/smooth_map ${COOKIEMASKPREFIX}_c$i.fits.gz $t 1024 ${COOKIEMASKPREFIX}_c${i}_${t}.fits.gz
+./trough_helpers/smooth_map ${COOKIEMASKPREFIX}_c$i.fits.gz $t 1024 ${COOKIEMASKPREFIX}_c${i}_${t}.fits.gz
 fi
 done
 done

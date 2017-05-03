@@ -29,6 +29,8 @@ shearmask=healpy.read_map(sys.argv[3])
 shearnside=healpy.npix2nside(len(shearmask))
 print("shear_nside=",shearnside)
 shearid=np.arange(len(shearmask))[shearmask>0]
+shearweight=shearmask[shearmask>0]
+soffset=math.sqrt(healpy.nside2pixarea(healpy.npix2nside(len(shearmask)),degrees=True)) # pixel width in deg
 shearmask=0
 stheta,sphi=healpy.pix2ang(shearnside,shearid)
 shearid=0
@@ -36,6 +38,11 @@ sra=np.degrees(sphi)
 sdec=np.degrees(pi/2.-stheta)
 stheta=0
 sphi=0
+
+# randomize source positions a tiny bit
+sra = sra + np.random.uniform(low=-soffset, high=+soffset)/np.cos(sdec*pi/180.)
+sdec = sdec + np.random.uniform(low=-soffset, high=+soffset)
+
 
 sigmagamma=sqrt(float(sys.argv[2])/(3600.*healpy.pixelfunc.nside2pixarea(shearnside,degrees=True)))
 
@@ -49,7 +56,7 @@ shear2=np.random.normal(scale=sigmagamma,size=len(sra))
 
 
 lens_cat = treecorr.Catalog(ra=lra, dec=ldec, ra_units='degrees', dec_units='degrees', w=weight)
-src_cat = treecorr.Catalog(ra=sra, dec=sdec,
+src_cat = treecorr.Catalog(ra=sra, dec=sdec, w=shearweight,
                                g1=shear1, g2=shear2,
                                ra_units='degrees', dec_units='degrees')
 
@@ -58,7 +65,7 @@ src_cat = treecorr.Catalog(ra=sra, dec=sdec,
 thmin = 5.
 thmax = 600.
 nth   = 24
-bslop = 0.2
+bslop = 0.1
 #####################
 
 ng = treecorr.NGCorrelation(nbins = nth, min_sep = thmin, max_sep = thmax,

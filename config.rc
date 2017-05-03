@@ -11,13 +11,14 @@ WORK=/scratch/dgruen
 RUN=sdss
 
 # NSIDE of mask and output maps; also max ell
-#NSIDE=4096 # quick job for testing
-#LMAX=10000  # maximum ell in input tables (should be >=NSIDE)
-NSIDE=256
-LMAX=1000
+NSIDE=4096 # quick job for testing
+LMAX=9999  # maximum ell in input tables (should be >=NSIDE)
 
 # path to flask executable
 FLASK=/u/ki/dgruen/flask/bin/flask
+
+# path to trough lenser executable
+TROUGHLENSER=/nfs/slac/g/ki/ki23/des/dgruen/trough_lenser/trough_flask_input
 
 # path to python
 PYTHON=/u/ki/dgruen/anaconda2/bin/python

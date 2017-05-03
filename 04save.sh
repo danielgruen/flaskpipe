@@ -11,7 +11,7 @@ source $2/config.rc
 
 echo "04SAVE..................."
 
-src=$WORK/fp_${RUN}_$1/$RUN
+src=$WORK/fp_${RUN}_$1/${RUN}
 
 dest=$SAVEDIR/${RUN}_$1
 mkdir -p $dest
