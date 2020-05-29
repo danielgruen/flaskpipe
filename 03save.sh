@@ -39,13 +39,6 @@ do
   gzip $i
 done
 
-cp $src/pofn*.tab $dest
-cp $src/gammat*.tab $dest
-cp $src/trough*.fits $dest
-cp $src/../pofn*.tab $dest
-cp $src/../gammat*.tab $dest
-cp $src/../trough*.fits $dest
-
 # clean up scratch directory
 echo rm -rf $WORK/fp_${RUN}_$1/
 rm -rf $WORK/fp_${RUN}_$1/

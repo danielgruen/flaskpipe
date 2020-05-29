@@ -15,10 +15,6 @@ echo --------------------------------- bash $d/02runflask.sh $1 $d
 bash $d/02runflask.sh $1 $d
 
 # optional: add your processing steps here to measure and save your data vectors
-echo --------------------------------- bash $d/03findtroughs.sh $1 $d
-bash $d/03findtroughs.sh $1 $d
-bash $d/03ggl.sh $1 $d
 
-
-echo --------------------------------- bash $d/04save.sh $1 $d
-bash $d/04save.sh $1 $d
+echo --------------------------------- bash $d/03save.sh $1 $d
+bash $d/03save.sh $1 $d
