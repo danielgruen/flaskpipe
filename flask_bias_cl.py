@@ -6,7 +6,23 @@ if(len(sys.argv)<5):
   sys.exit(1)
 
 t=np.genfromtxt(sys.argv[1], dtype=(int,int,float,float,int,float,float))
-bias=[float(s) for s in sys.argv[3:-1]]
+
+
+biases_string = sys.argv[3:-1][0]
+bias_strings = biases_string.split(",")
+
+#print("")
+#print("")
+#print(sys.argv[2:-1])
+#print("")
+#bias=[float(s) for s in sys.argv[2:-1]]
+bias=[float(s) for s in bias_strings]
+
+
+
+
+
+#bias=[float(s) for s in sys.argv[3:-1]]
 
 bi=0
 bai=0
@@ -27,8 +43,20 @@ print(ba)
 
 for f1,b1 in zip(t,ba):
  for f2,b2 in zip(t,ba):
+  if f1[0]==10:
+   f1[0]=0
+  if f2[0]==10:
+   f2[0]=0
   if(f1[0]>f2[0] or (f1[0]==f2[0] and f1[1]>f2[1])):
+   if f1[0]==0:
+    f1[0]=10
+   if f2[0]==0:
+    f2[0]=10
    continue
+  if f1[0]==0:
+   f1[0]=10
+  if f2[0]==0:
+   f2[0]=10
   cl=np.genfromtxt(sys.argv[2]+"f"+str(f1[0])+"z"+str(f1[1])+"f"+str(f2[0])+"z"+str(f2[1])+".dat") 
   print("multiplying Cl",f1[0],f1[1]," ",f2[0],f2[1],"by bias",b1,"*",b2)
   cl[:,1] *= b1*b2

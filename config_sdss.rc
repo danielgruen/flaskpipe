@@ -17,5 +17,5 @@ NSOURCEBINS=1
 # tracer density (unmasked) per arcmin^2, one per f1zX matter density field
 DENSITY=("0.04377") # SDSS, redMaGiC, z=0.2..0.45, 10' and 20' doesn't matter, corrected for 10 per-cent masking
 # tracer bias, one per f1zX matter density field
-BIAS=("1.54")
+BIAS=("1.0","1.0","1.0","1.0","1.0")
 

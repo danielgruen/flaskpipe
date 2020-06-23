@@ -21,10 +21,14 @@ echo cp $PREFIX/${RUN}.config $scratchdir
 cp $PREFIX/${RUN}.config $scratchdir
 echo $PYTHON $PREFIX/flask_bias_info.py ${RUN}-info.dat ${BIAS[*]} $scratchdir/${RUN}-info.dat
 $PYTHON $PREFIX/flask_bias_info.py ${RUN}-info.dat ${BIAS[*]} $scratchdir/${RUN}-info.dat
+#echo cp ${RUN}-info.dat $scratchdir
+#cp ${RUN}-info.dat $scratchdir
 
 # (3) copy Cl files, apply bias
 echo $PYTHON $PREFIX/flask_bias_cl.py ${RUN}-info.dat ${RUN}Cl- ${BIAS[*]} $scratchdir/${RUN}Cl-
 $PYTHON $PREFIX/flask_bias_cl.py ${RUN}-info.dat ${RUN}Cl- ${BIAS[*]} $scratchdir/${RUN}Cl-
+#echo cp ${RUN}Cl- $scratchdir
+#cp ${RUN}Cl- $scratchdir
 
 # (4) copy n(z) files
 #echo cp $PREFIX/${RUN}pz-f?.dat  $scratchdir

@@ -7,7 +7,20 @@ if(len(sys.argv)<4):
 
 t=numpy.genfromtxt(sys.argv[1], dtype=(int,int,float,float,int,float,float))
 
-bias=[float(s) for s in sys.argv[2:-1]]
+biases_string = sys.argv[2:-1][0]
+bias_strings = biases_string.split(",")
+
+#print("")
+#print("")
+#print(sys.argv[2:-1])
+#print("")
+#bias=[float(s) for s in sys.argv[2:-1]]
+bias=[float(s) for s in bias_strings]
+#bias = []
+#for s in sys.argv[2:-1]:
+#  print(s)
+#  print(float(s))
+#  bias.append(float(s))
 
 bi=0
 

@@ -1,18 +1,22 @@
 # bash profile for setting environment variables
-source /u/ki/dgruen/.bash_profile
+source /u/ec/aresh/.bash_profile
 
 # prefix with all the files to use
-PREFIX=/u/ki/dgruen/work/flaskpipe
+PREFIX=/nfs/slac/kipac/fs1/g/des/aresh/Gamma_Ray_x_DES/notebook_scripts_and_outputs/using_raw_data/cross/for_all_z_and_E_bins_new_foreground_subtraction/flask_directory/stefano_cls/flaskpipe
+MAXPARS=150
+
+MASK=mask_sdss_sum.fits.gz
 
 # work directory parent dir for flask, something like your scratch base dir
-WORK=/scratch/dgruen
+WORK=/nfs/slac/kipac/fs1/g/des/aresh/Gamma_Ray_x_DES/notebook_scripts_and_outputs/using_raw_data/cross/for_all_z_and_E_bins_new_foreground_subtraction/flask_directory/stefano_cls/flaskpipe/work
 
 # run name (prefix for flask config, Cl, p(z) files)
 RUN=sdss
 
 # NSIDE of mask and output maps; also max ell
 NSIDE=4096 # quick job for testing
-LMAX=9999  # maximum ell in input tables (should be >=NSIDE)
+#LMAX=9999  # maximum ell in input tables (should be >=NSIDE)
+LMAX=466  # maximum ell in input tables (should be >=NSIDE)
 
 # path to flask executable
 FLASK=/u/ki/dgruen/flask/bin/flask
@@ -21,7 +25,7 @@ FLASK=/u/ki/dgruen/flask/bin/flask
 TROUGHLENSER=/nfs/slac/g/ki/ki23/des/dgruen/trough_lenser/trough_flask_input
 
 # path to python
-PYTHON=/u/ki/dgruen/anaconda2/bin/python
+PYTHON=/nfs/slac/g/ki/ki19/des/aresh/Old_Stuff/Code_Depository/folder_for_miniconda3/bin/python
 
 # directory to save results in in the end (will be in subdirectories $RUN_$ID)
-SAVEDIR=/nfs/slac/g/ki/ki23/des/flaskpipe/output/
+SAVEDIR=/nfs/slac/kipac/fs1/g/des/aresh/Gamma_Ray_x_DES/notebook_scripts_and_outputs/using_raw_data/cross/for_all_z_and_E_bins_new_foreground_subtraction/flask_directory/stefano_cls/flaskpipe/output

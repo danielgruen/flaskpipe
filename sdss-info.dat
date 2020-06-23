@@ -1,6 +1,46 @@
-# Field number, z bin number, mean, shift, field type, zmin, zmax
-# Types: 1-galaxies 2-shear
+#   Jun-2019 using       (Cl_zmax=1088)
+# These log-normal shift parameters have been computed for the Y3 fiducial analysis setup as of April 05, 2019.
+# (and using the method of matching log-normal PDFs to the PDF of density fluctuations described by Friedrich++2018)
+#
+# - four source bins, nz_y3_source_Ntomo4.txt
+# - five redmagic-like bins, nz_gauss_redmagic_hd3_hl2_norm.txt
+# -- biases = [1.7, 1.7, 1.7, 2.0, 2.0]
+#    physical scale = 7 Mpc (comoving) 
+#   #   Further details in:
+#   #   https://cdcvs.fnal.gov/redmine/attachments/52953/shift_params.xt
+#
+# Cosmology:
+#
+# Omega_m   = 0.3
+# sigma_8   = 0.82355
+# n_spec    = 0.97
+# w0=-1.
+# wa=0.
+# omb=0.048
+# h0=0.69
+# Omega_nu   = 0.0 (MY CODE UNFROTUNATELY CAN'T YET INCLUDE NEUTRINOS)
+# Omega_v   = 1.0-Omega_m - Omega_nu
+#
+#   # Field number, z bin number, mean, shift, field type, zmin, zmax have 
+#   # zmin , zmax for type 2 is not important
+#   # if you have density, you dont need to pass dndz of type 2 to flask
+#   # Types: 1-galaxies 2-shear
+#
+#   TODO: check if its ok to use the old shifts from felipe here or if that will cause errors (the shifts may be even more of an issue for the field 6,7,8 entries (for gamma rays))
+ 1  1 0.0000   1.089205872849     1   0.1000    0.5000
+ 2  2 0.0000   1.1060637918861    1   0.2000    0.6000
+ 3  3 0.0000   1.0467492798313    1   0.4000    0.8500
+ 4  4 0.0000   1.251782267554     1   0.5000    1.1000
+ 5  5 0.0000   1.176572939112     1   0.6000    1.2000
 
-    1    1   0.0000   6.6876399587e-01      1   0.2000   0.4500
-    2    1   0.0000   9.4229888590e-03      2   0.2000   0.4500
-    2    2   0.0000   1000.               2   0.0000   2.0000
+# 6  1 0.0000   0.0045254600197    1   0.1000    0.5000
+# 6  2 0.0000   0.0088524048380    1   0.2000    0.6000
+# 6  3 0.0000   0.0191781225951    1   0.4000    0.8500
+# 7  4 0.0000   0.0328746634851    1   0.1000    0.5000
+# 7  5 0.0000   0.0045254600197    1   0.2000    0.6000
+# 7  6 0.0000   0.0088524048380    1   0.4000    0.8500
+# 8  7 0.0000   0.0191781225951    1   0.1000    0.5000
+# 8  8 0.0000   0.0328746634851    1   0.2000    0.6000
+# 8  9 0.0000   2.0000000000000    1   0.4000    0.8500 
+
+
