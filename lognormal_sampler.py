@@ -251,4 +251,4 @@ for Emin, Emax, fz_delineation in zip(Emins, Emaxs, fz_delineations):
 
 
 for run_directory in run_directories:
-    os.system("bsub -o {0}/call_cross_correlations.txt python {0}/call_cross_correlations.py --nside {1} --zbin_edge1 {2} --zbin_edge2 {3} --zbin_edge3 {4} --zbin_edge4 {5} --zbin_edge5 {6} --zbin_edge6 {7} --data_type {8}".format(run_directory, nside, bin_edges[0], bin_edges[1], bin_edges[2], bin_edges[3], bin_edges[4], bin_edges[5], "log_realiz"))
+    os.system("bsub -o {0}/call_cross_correlations.txt python {0}/call_cross_correlations.py --nside {1} --bin_edges_filename {2} --data_type {3}".format(run_directory, nside, bin_edges_filename, "log_realiz"))
