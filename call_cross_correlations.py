@@ -30,19 +30,31 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--nside')
 parser.add_argument('--bin_edges_filename')
 parser.add_argument('--data_type')
+parser.add_argument('--Emin')
+parser.add_argument('--Emax')
+parser.add_argument('--gamma_catalog_filename')
+parser.add_argument('--galaxy_mask_filename')
+parser.add_argument('--gamma_ray_map_unmasked_directory')
+parser.add_argument('--gamma_ray_mask_map_directory')
 options = parser.parse_args()
 nside = int(options.nside)
-bin_edges_filename = options.bin_edges_filename
-data_type = float(options.data_type)
+bin_edges_filename = float(options.bin_edges_filename)
+data_type = options.data_type
+Emin = options.Emin
+Emax = options.Emax
+gamma_catalog_filename = options.gamma_catalog_filename
+galaxy_mask_filename = options.galaxy_mask_filename
+gamma_ray_map_unmasked_directory = options.gamma_ray_map_unmasked_directory
+gamma_ray_mask_map_directory = options.gamma_ray_mask_map_directory
 print("nside: {0}".format(nside))
 print("bin_edges_filename: {0}".format(bin_edges_filename))
 print("data_type: {0}".format(data_type))
-
-np.load(bin_edges_filename)
-zmins = bin_edges[0:5]
-zmaxs = bin_edges[1:6]
-Emins = bin_edges[6,15]
-Emaxs = bin_edges[7,16]
+print("Emin: {0}".format(Emin))
+print("Emax: {0}".format(Emax))
+print("galaxy_catalog_filename: {0}".format(galaxy_catalog_filename))
+print("galaxy_mask_filename: {0}".format(galaxy_mask_filename))
+print("gamma_ray_map_unmasked_directory: {0}".format(gamma_ray_map_unmasked_directory))
+print("gamma_ray_mask_map_directory: {0}".format(gamma_ray_mask_map_directory))
 
 
 
@@ -56,6 +68,6 @@ def find_directory_for_this_file_and_the_name_of_this_file_without_the_extension
 
 core_directory, program_name_no_extension = find_directory_for_this_file_and_the_name_of_this_file_without_the_extension()
 
-os.system("bsub -W 79 -R rhel60 -o {0}/cross_correlations.txt python {0}/cross_correlations.py --nside {1} --bin_edges_filename {2} --data_type {3}".format(core_directory, nside, bin_edges_filename, data_type))
+os.system("bsub -W 79 -R rhel60 -o {0}/cross_correlations.txt python {0}/cross_correlations.py --nside {1} --bin_edges_filename {2} --data_type {3} --Emin {4} --Emax {5} --galaxy_catalog_filename {6} --galaxy_mask_filename {7} --gamma_ray_map_unmasked_directory {8} --gamma_ray_mask_map_directory {9}".format(core_directory, nside, bin_edges_filename, data_type, Emin, Emax, galaxy_catalog_filename, galaxy_mask_filename, gamma_ray_mask_map_directory))
 
 
