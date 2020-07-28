@@ -28,6 +28,7 @@ import warnings
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument('--nside')
+parser.add_argument('--nside_for_galaxy_mask_map')
 parser.add_argument('--lognormal_mask_filename', default = "/nfs/slac/kipac/fs1/g/des/aresh/Gamma_Ray_x_DES/notebook_scripts_and_outputs/using_raw_data/cross/for_all_z_and_E_bins_new_foreground_subtraction/flask_directory/stefano_cls/flaskpipe/mask_sdss_sum.fits.gz")
 parser.add_argument('--bin_edges_filename', default = "/nfs/slac/kipac/fs1/g/des/aresh/Gamma_Ray_x_DES/notebook_scripts_and_outputs/using_raw_data/cross/for_all_z_and_E_bins_new_foreground_subtraction/flask_directory/stefano_cls/flaskpipe/bin_edges.npy")
 parser.add_argument('--galaxy_catalog_filename', default = "/nfs/slac/kipac/fs1/g/des/aresh/Gamma_Ray_x_DES/redMaGiC_Maps_from_redmine/5bins_hidens_hilum_higherlum_jointmask_0.15-0.9_magauto_mof_combo_removedupes_spt_fwhmi_exptimei_cut_badpix_sample_weighted2sig.fits")
@@ -37,6 +38,7 @@ parser.add_argument('--gamma_ray_mask_map_directory', default = "/nfs/slac/kipac
 parser.add_argument('--exposure_map_directory', default = "/nfs/slac/kipac/fs1/g/des/aresh/Gamma_Ray_x_DES/raw_photon_exposure_and_foreground_data/expos_9years_binned")
 options = parser.parse_args()
 nside = int(options.nside)
+nside_for_galaxy_mask_map = int(options.nside_for_galaxy_mask_map)
 lognormal_mask_filename = options.lognormal_mask_filename
 bin_edges_filename = options.bin_edges_filename
 galaxy_catalog_filename = options.galaxy_catalog_filename
@@ -45,6 +47,7 @@ gamma_ray_map_unmasked_directory = options.gamma_ray_map_unmasked_directory
 gamma_ray_mask_map_directory = options.gamma_ray_mask_map_directory
 exposure_map_directory = options.exposure_map_directory
 print("nside: {0}".format(nside))
+print("nside_for_galaxy_mask_map: {0}".format(nside_for_galaxy_mask_map))
 print("lognormal_mask_filename: {0}".format(lognormal_mask_filename))
 print("bin_edges_filename: {0}".format(bin_edges_filename))
 print("galaxy_catalog_filename: {0}".format(galaxy_catalog_filename))
@@ -53,11 +56,11 @@ print("gamma_ray_map_unmasked_directory: {0}".format(gamma_ray_map_unmasked_dire
 print("gamma_ray_mask_map_directory: {0}".format(gamma_ray_mask_map_directory))
 print("exposure_map_directory: {0}".format(exposure_map_directory))
 
-np.load(bin_edges_filename)
+bin_edges = np.load(bin_edges_filename)
 zmins = bin_edges[0:5]
 zmaxs = bin_edges[1:6]
-Emins = bin_edges[6,15]
-Emaxs = bin_edges[7,16]
+Emins = bin_edges[6:15]
+Emaxs = bin_edges[7:16]
 
 number_of_pixels_int = hp.nside2npix(nside)
 number_of_pixels = float(number_of_pixels_int)
@@ -71,7 +74,7 @@ np.random.seed(12345)
 def get_ras_and_decs_and_weights_given_nonzero_or_unmasked_pixels_generic_and_generic_map_or_generic_mask_map(nonzero_or_unmasked_pixels_generic, generic_map_or_generic_mask_map, for_sampled_galaxies=False):
 
     if for_sampled_galaxies:
-        number_of_random_points = np.sum(generic_map_or_generic_mask_map)
+        number_of_random_points = int(np.sum(generic_map_or_generic_mask_map))
         pixels_for_all_random_points = []
         counter = 0
         while True:
@@ -85,8 +88,6 @@ def get_ras_and_decs_and_weights_given_nonzero_or_unmasked_pixels_generic_and_ge
         number_of_random_points = len(nonzero_or_unmasked_pixels_generic)
         pixels_for_all_random_points = copy.deepcopy(nonzero_or_unmasked_pixels_generic)
 
-
-
     pixel_half_sqrt_angular_area = np.sqrt((4 * np.pi)/number_of_pixels)/2.0
     expansive_angular_increment = pixel_half_sqrt_angular_area * 3.0
     thetas_of_pixels, phis_of_pixels = hp.pixelfunc.pix2ang(nside, pixels_for_all_random_points)
@@ -96,12 +97,17 @@ def get_ras_and_decs_and_weights_given_nonzero_or_unmasked_pixels_generic_and_ge
     galats_of_pixels_perturbed = []
     weights_of_pixels_perturbed = []
 
-
-    pixels_with_locations_not_found_all_random_points = np.ones(number_of_random_points, dtype=bool)
-    while True:        
-        thetas_with_locations_not_found = thetas_of_pixels[pixels_with_locations_not_found_all_random_points]
-        galons_with_locations_not_found = galons_of_pixels[pixels_with_locations_not_found_all_random_points]
-        galats_with_locations_not_found = galats_of_pixels[pixels_with_locations_not_found_all_random_points]
+    locations_not_found_all_random_points = np.ones(number_of_random_points, dtype=bool)
+    pixels_for_all_random_points_with_locations_not_found = copy.deepcopy(pixels_for_all_random_points)
+    counter = -1
+    while True:
+        counter = counter + 1
+        if len(pixels_for_all_random_points_with_locations_not_found)  == 0:
+            break
+       
+        thetas_with_locations_not_found = thetas_of_pixels[locations_not_found_all_random_points]
+        galons_with_locations_not_found = galons_of_pixels[locations_not_found_all_random_points]
+        galats_with_locations_not_found = galats_of_pixels[locations_not_found_all_random_points]
 
         galon_mins = galons_with_locations_not_found - expansive_angular_increment/np.sin(thetas_with_locations_not_found)
         galon_maxs = galons_with_locations_not_found + expansive_angular_increment/np.sin(thetas_with_locations_not_found)
@@ -115,14 +121,16 @@ def get_ras_and_decs_and_weights_given_nonzero_or_unmasked_pixels_generic_and_ge
         thetas_of_pixels_perturbed = -galats_of_pixels_perturbed_with_locations_not_found + np.pi/2.0
         phis_of_pixels_perturbed = copy.deepcopy(galons_of_pixels_perturbed_with_locations_not_found)
         potential_pix_numbers = hp.pixelfunc.ang2pix(nside=nside, theta = thetas_of_pixels_perturbed, phi = phis_of_pixels_perturbed)
-        successful_match_indices = np.where(potential_pix_numbers == pixels_with_locations_not_found_all_random_points)[0]
-        failed_match_indices = np.where(potential_pix_numbers != pixels_with_locations_not_found_all_random_points)[0]
-
+        successful_match_indices = np.where(potential_pix_numbers == pixels_for_all_random_points_with_locations_not_found)[0]
+        failed_match_indices = np.where(potential_pix_numbers != pixels_for_all_random_points_with_locations_not_found)[0]
         galons_of_pixels_perturbed = galons_of_pixels_perturbed + galons_of_pixels_perturbed_with_locations_not_found[successful_match_indices].tolist()
         galats_of_pixels_perturbed = galats_of_pixels_perturbed + galats_of_pixels_perturbed_with_locations_not_found[successful_match_indices].tolist()
-        pixels_with_locations_just_found_all_random_points = pixels_with_locations_not_found_all_random_points[successful_match_indices]
+        pixels_with_locations_just_found_all_random_points = pixels_for_all_random_points_with_locations_not_found[successful_match_indices]
         weights_of_pixels_perturbed = weights_of_pixels_perturbed + generic_map_or_generic_mask_map[pixels_with_locations_just_found_all_random_points].tolist()
-        pixels_with_locations_not_found_all_random_points = pixels_with_locations_not_found_all_random_points[failed_match_indices]
+        was_true = np.where(locations_not_found_all_random_points == True)[0]
+        was_true_but_is_now_false = was_true[successful_match_indices]
+        locations_not_found_all_random_points[was_true_but_is_now_false] = False
+        pixels_for_all_random_points_with_locations_not_found = pixels_for_all_random_points_with_locations_not_found[failed_match_indices]
 
     galons_of_pixels_perturbed = np.array(galons_of_pixels_perturbed)
     galats_of_pixels_perturbed = np.array(galats_of_pixels_perturbed)
@@ -146,10 +154,9 @@ def generate_lognormal_galaxy_catalogues(zmin, zmax, fz_delineation, hdu_data_ta
     zs = hdu_data_table['ZREDMAGIC']
     new_ras_indices = np.where((zs > zmin) & (zs < zmax))[0]
     number_of_galaxies = len(new_ras_indices)
-    number_of_galaxies_per_unmasked_pixel = number_of_galaxies/sum_of_pixel_mask_values    
-    
+    number_of_galaxies_per_unmasked_pixel = number_of_galaxies/sum_of_pixel_mask_values
 
-    smooth_galaxy_overdensity_map = hp.read_map("{0}/map-{1}.fits".format(core_directory,fz_delineation))
+    smooth_galaxy_overdensity_map = hp.read_map("{0}/map-{1}.fits.gz".format(core_directory,fz_delineation))
     smooth_galaxy_overdensity_map = hp.ud_grade(smooth_galaxy_overdensity_map, nside)
     if np.any(smooth_galaxy_overdensity_map < -1.0):
         warnings.warn("Warning: smooth_galaxy_overdensity_map has values < -1.0. Setting these to -1.0 to prevent issues with the Poisson sampling")
@@ -168,6 +175,7 @@ def generate_lognormal_galaxy_catalogues(zmin, zmax, fz_delineation, hdu_data_ta
 
 def generate_lognormal_gamma_ray_catalogues(Emin, Emax, fz_delineation, gamma_ray_map_unmasked_directory, gamma_ray_mask_map_directory, exposure_map_directory, lognormal_mask, core_directory, nside):
     
+
     gamma_ray_map_unmasked = hp.read_map("{0}/flux_9years_{1}_{2}_MeV_C.fits".format(gamma_ray_map_unmasked_directory, Emin,Emax)) 
     gamma_ray_mask_map_high_res = hp.read_map("{0}/mask_GP30.0_sources_variable_FL8Y_incl_3FHL_incl_{1}_{2}_MeV_hpx_ord10.fits".format(gamma_ray_mask_map_directory, Emin,Emax))
     gamma_ray_map_high_res = gamma_ray_map_unmasked * hp.ud_grade(gamma_ray_mask_map_high_res, hp.npix2nside(len(gamma_ray_map_unmasked)))
@@ -178,14 +186,15 @@ def generate_lognormal_gamma_ray_catalogues(Emin, Emax, fz_delineation, gamma_ra
     gamma_ray_mask_map = hp.ud_grade(gamma_ray_mask_map_high_res, nside)
     sum_of_pixel_mask_values = np.sum(gamma_ray_mask_map)
     number_of_photons_per_unmasked_pixel = np.sum(photon_map)/sum_of_pixel_mask_values
-    
-    
-    smooth_photon_overdensity_map = hp.read_map("{0}/map-{1}.fits".format(core_directory,fz_delineation))
+        
+
+    smooth_photon_overdensity_map = hp.read_map("{0}/map-{1}.fits.gz".format(core_directory,fz_delineation))
     smooth_photon_overdensity_map = hp.ud_grade(smooth_photon_overdensity_map, nside)
     if np.any(smooth_photon_overdensity_map < -1.0):
         warnings.warn("Warning: smooth_photon_overdensity_map has values < -1.0. Setting these to -1.0 to prevent issues with the Poisson sampling")
-    	smooth_photon_overdensity_map = np.where(smooth_photon_overdensity_map >= -1.0, smooth_photon_overdensity_map, -1.0)
+        smooth_photon_overdensity_map = np.where(smooth_photon_overdensity_map >= -1.0, smooth_photon_overdensity_map, -1.0)
     unsampled_photon_map = number_of_photons_per_unmasked_pixel * (smooth_photon_overdensity_map + 1.0) * lognormal_mask
+
 
     sampled_photon_map = np.random.poisson(unsampled_photon_map).astype(np.float)
     sampled_gamma_ray_map = sampled_photon_map / exposure_map
@@ -216,16 +225,17 @@ run_directories = []
 for Emin, Emax in zip(Emins, Emaxs):
     directory = "{0}/E_{1}_{2}_MeV".format(core_directory, Emin, Emax)
     for zmin, zmax in zip(zmins, zmaxs):
-        inner_directory = "mkdir {0}/z_{1}_{2}".format(directory, zmin, zmax)
+        inner_directory = "{0}/z_{1}_{2}".format(directory, zmin, zmax)
         os.system("mkdir {}".format(inner_directory))
     os.system("cp {0}/call_cross_correlations.py {0}/cross_correlations.py {1}".format(core_directory,directory))
     run_directories.append(directory)
 
 
-
-
 hdu = fits.open(galaxy_mask_filename)
-RM_galaxy_mask_map = copy.deepcopy(hdu[1].data["FRACGOOD"])
+RM_galaxy_mask_map = np.zeros(hp.nside2npix(nside_for_galaxy_mask_map))
+for index in list(range(0,len(hdu[1].data["HPIX"]))):
+    unmasked_pixel = hdu[1].data["HPIX"][index]
+    RM_galaxy_mask_map[unmasked_pixel] = hdu[1].data["FRACGOOD"][index]
 RM_galaxy_mask_map = hp.ud_grade(RM_galaxy_mask_map, nside)
 sum_of_pixel_mask_values = np.sum(RM_galaxy_mask_map)
 #print(sum_of_pixel_mask_values)
@@ -240,7 +250,6 @@ for zmin, zmax, fz_delineation in zip(zmins, zmaxs, fz_delineations):
 
 
 
-
 #Emins = [631.0, 1202.3, 2290.9, 4786.3, 9120.1, 17378.0, 36307.8, 69183.1, 131825.7]
 #Emaxs = [1202.3, 2290.9, 4786.3, 9120.1, 17378.0, 36307.8, 69183.1, 131825.7, 1000000.0]
 fz_delineations = ["f6z1", "f6z2", "f6z3", "f6z4", "f6z5", "f6z6", "f6z7", "f6z8", "f6z9"]
@@ -251,4 +260,5 @@ for Emin, Emax, fz_delineation in zip(Emins, Emaxs, fz_delineations):
 
 
 for run_directory, Emin, Emax in zip(run_directories, Emins, Emaxs):
-    os.system("bsub -o {0}/call_cross_correlations.txt python {0}/call_cross_correlations.py --nside {1} --bin_edges_filename {2} --data_type {3} --Emin {4} --Emax {5} --galaxy_catalog_filename {6} --galaxy_mask_filename {7} --gamma_ray_map_unmasked_directory {8} --gamma_ray_mask_map_directory {9}".format(run_directory, nside, bin_edges_filename, "log_realiz", Emin, Emax, galaxy_catalog_filename, galaxy_mask_filename, gamma_ray_map_unmasked_directory, gamma_ray_mask_map_directory))
+    print("bsub -o {0}/call_cross_correlations.txt python {0}/call_cross_correlations.py --nside {1} --nside_for_galaxy_mask_map {2} --bin_edges_filename {3} --data_type {4} --Emin {5} --Emax {6} --galaxy_catalog_filename {7} --galaxy_mask_filename {8} --gamma_ray_map_unmasked_directory {9} --gamma_ray_mask_map_directory {10}".format(run_directory, nside, nside_for_galaxy_mask_map, bin_edges_filename, "log_realiz", Emin, Emax, galaxy_catalog_filename, galaxy_mask_filename, gamma_ray_map_unmasked_directory, gamma_ray_mask_map_directory))
+    os.system("bsub -o {0}/call_cross_correlations.txt python {0}/call_cross_correlations.py --nside {1} --nside_for_galaxy_mask_map {2} --bin_edges_filename {3} --data_type {4} --Emin {5} --Emax {6} --galaxy_catalog_filename {7} --galaxy_mask_filename {8} --gamma_ray_map_unmasked_directory {9} --gamma_ray_mask_map_directory {10}".format(run_directory, nside, nside_for_galaxy_mask_map, bin_edges_filename, "log_realiz", Emin, Emax, galaxy_catalog_filename, galaxy_mask_filename, gamma_ray_map_unmasked_directory, gamma_ray_mask_map_directory))

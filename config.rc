@@ -3,7 +3,7 @@ source /u/ec/aresh/.bash_profile
 
 # prefix with all the files to use
 PREFIX=/nfs/slac/kipac/fs1/g/des/aresh/Gamma_Ray_x_DES/notebook_scripts_and_outputs/using_raw_data/cross/for_all_z_and_E_bins_new_foreground_subtraction/flask_directory/stefano_cls/flaskpipe
-MAXPARS=150
+#MAXPARS=150
 
 MASK=mask_sdss_sum.fits.gz
 
@@ -16,7 +16,7 @@ RUN=sdss
 # NSIDE of mask and output maps; also max ell
 NSIDE=4096 # quick job for testing
 #LMAX=9999  # maximum ell in input tables (should be >=NSIDE)
-LMAX=466  # maximum ell in input tables (should be >=NSIDE)
+LMAX=4999  # maximum ell in input tables (should be >=NSIDE)
 
 # path to flask executable
 FLASK=/u/ki/dgruen/flask/bin/flask

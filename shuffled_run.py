@@ -28,9 +28,9 @@ import fileinput
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument('--nside')
+parser.add_argument('--seed')
 parser.add_argument('--nside_for_galaxy_mask_map')
 parser.add_argument('--bin_edges_filename')
-parser.add_argument('--data_type')
 parser.add_argument('--Emin')
 parser.add_argument('--Emax')
 parser.add_argument('--galaxy_catalog_filename')
@@ -41,7 +41,6 @@ options = parser.parse_args()
 nside = int(options.nside)
 nside_for_galaxy_mask_map = int(options.nside_for_galaxy_mask_map)
 bin_edges_filename = options.bin_edges_filename
-data_type = options.data_type
 Emin = options.Emin
 Emax = options.Emax
 galaxy_catalog_filename = options.galaxy_catalog_filename
@@ -51,7 +50,6 @@ gamma_ray_mask_map_directory = options.gamma_ray_mask_map_directory
 print("nside: {0}".format(nside))
 print("nside_for_galaxy_mask_map: {0}".format(nside_for_galaxy_mask_map))
 print("bin_edges_filename: {0}".format(bin_edges_filename))
-print("data_type: {0}".format(data_type))
 print("Emin: {0}".format(Emin))
 print("Emax: {0}".format(Emax))
 print("galaxy_catalog_filename: {0}".format(galaxy_catalog_filename))
@@ -66,9 +64,10 @@ zmaxs = bin_edges[1:6]
 number_of_pixels_int = hp.nside2npix(nside)
 number_of_pixels = float(number_of_pixels_int)
 
-np.random.seed(12345)
-
-
+seed = options.seed
+random_seed = int(seed)
+print("random_seed: {0}".format(random_seed))
+np.random.seed(random_seed)
 
 
 
@@ -163,22 +162,17 @@ def find_directory_for_this_file_and_the_name_of_this_file_without_the_extension
 super_core_directory, program_name_no_extension = find_directory_for_this_file_and_the_name_of_this_file_without_the_extension()
 
 for zmin, zmax in zip(zmins,zmaxs):
-    if data_type =="log_realiz":
-        ras = np.load("{0}/../sampled_ras_z_{1}_{2}.npy".format(super_core_directory, zmin, zmax))
-        decs = np.load("{0}/../sampled_decs_z_{1}_{2}.npy".format(super_core_directory, zmin, zmax))
-        weights = np.ones(len(ras))
-    else:
-        hdu = fits.open("{0}/5bins_hidens_hilum_higherlum_jointmask_0.15-0.9_magauto_mof_combo_removedupes_spt_fwhmi_exptimei_cut_badpix_sample_weighted2sig.fits".format(galaxy_catalog_filename))
+    hdu = fits.open("{0}/5bins_hidens_hilum_higherlum_jointmask_0.15-0.9_magauto_mof_combo_removedupes_spt_fwhmi_exptimei_cut_badpix_sample_weighted2sig.fits".format(galaxy_catalog_filename))
 
-        ras = hdu[1].data['RA']
-        decs = hdu[1].data['DEC']
-        weights = hdu[1].data['weight']
-        zs = hdu[1].data['ZREDMAGIC']
-        new_ras_indices = np.where((zs > zmin) & (zs < zmax))[0]
-                
-        ras = ras[new_ras_indices]
-        decs = decs[new_ras_indices]
-        weights =  weights[new_ras_indices]
+    ras = hdu[1].data['RA']
+    decs = hdu[1].data['DEC']
+    weights = hdu[1].data['weight']
+    zs = hdu[1].data['ZREDMAGIC']
+    new_ras_indices = np.where((zs > zmin) & (zs < zmax))[0]
+            
+    ras = ras[new_ras_indices]
+    decs = decs[new_ras_indices]
+    weights =  weights[new_ras_indices]
 
     cat_galaxy = tr.Catalog(ra=ras, dec=decs, w=weights, ra_units='degrees', dec_units='degrees')
 
@@ -187,14 +181,11 @@ for zmin, zmax in zip(zmins,zmaxs):
 
 
     core_directory = super_core_directory + "/z_{0}_{1}".format(zmin,zmax)
-    if data_type =="log_realiz":
-        RM_galaxy_mask_map = hp.read_map("{0}/../../../mask_sdss_sum.fits.gz".format(super_core_directory))
-    else:
-        hdu = fits.open("{0}/5bins_hidens_hilum_higherlum_jointmask_0.15-0.9_magauto_mof_combo_removedupes_spt_fwhmi_exptimei_cut_badpix_mask.fits".format(galaxy_mask_map_directory))
-        RM_galaxy_mask_map = np.zeros(hp.nside2npix(nside_for_galaxy_mask_map))
-        for index in list(range(0,len(hdu[1].data["HPIX"]))):
-            unmasked_pixel = hdu[1].data["HPIX"][index]
-            RM_galaxy_mask_map[unmasked_pixel] = hdu[1].data["FRACGOOD"][index]
+    hdu = fits.open(galaxy_mask_filename)
+    RM_galaxy_mask_map = np.zeros(hp.nside2npix(nside_for_galaxy_mask_map))
+    for index in list(range(0,len(hdu[1].data["HPIX"]))):
+        unmasked_pixel = hdu[1].data["HPIX"][index]
+        RM_galaxy_mask_map[unmasked_pixel] = hdu[1].data["FRACGOOD"][index]
 
     unmasked_pixels = np.where(RM_galaxy_mask_map != 0.0)[0]
 
@@ -219,17 +210,20 @@ for zmin, zmax in zip(zmins,zmaxs):
 
 
 
-    if data_type =="log_realiz":
-        photon_map_unmasked = hp.read_map("{0}/../sampled_gamma_ray_map_{1}_{2}_MeV.fits".format(super_core_directory, Emin, Emax))
-    else:
-        photon_map_unmasked = hp.read_map("{0}/flux_9years_{1}_{2}_MeV_C.fits".format(gamma_ray_map_unmasked_directory, Emin, Emax))
-    if data_type =="log_realiz":
-        photon_mask_map_high_res = copy.deepcopy(RM_galaxy_mask_map)
-    else:
-        photon_mask_map_high_res = hp.read_map("{0}/mask_GP30.0_sources_variable_FL8Y_incl_3FHL_incl_{1}_{2}_MeV_hpx_ord10.fits".format(gamma_ray_mask_map_directory, Emin, Emax))
+    photon_map_unmasked = hp.read_map("{0}/flux_9years_{1}_{2}_MeV_C.fits".format(gamma_ray_map_unmasked_directory, Emin, Emax))
+    photon_mask_map_high_res = hp.read_map("{0}/mask_GP30.0_sources_variable_FL8Y_incl_3FHL_incl_{1}_{2}_MeV_hpx_ord10.fits".format(gamma_ray_mask_map_directory, Emin, Emax))
     photon_map_high_res = photon_map_unmasked * hp.ud_grade(photon_mask_map_high_res, hp.npix2nside(len(photon_map_unmasked)))
     photon_map = hp.ud_grade(photon_map_high_res, nside)
     photon_mask_map = hp.ud_grade(photon_mask_map_high_res, nside)
+
+
+
+    unmasked_pixels_photon = np.where(photon_mask_map != 0.0)[0]
+    unmasked_pixel_values_photon = photon_map[unmasked_pixels_photon]
+    shuffled_unmasked_pixel_values_photon = copy.deepcopy(unmasked_pixel_values_photon)
+    np.random.shuffle(shuffled_unmasked_pixel_values_photon)
+    for u, unmasked_pixel in enumerate(unmasked_pixels_photon):
+        photon_map[unmasked_pixel] = shuffled_unmasked_pixel_values_photon[u]
 
 
 
@@ -239,23 +233,30 @@ for zmin, zmax in zip(zmins,zmaxs):
 
 
 
-    unmasked_pixels_photon = np.where(photon_mask_map != 0.0)[0]
     proper_rand_ras_photon, proper_rand_decs_photon, proper_rand_weights_photon = get_ras_and_decs_and_weights_given_nonzero_or_unmasked_pixels_generic_and_generic_map_or_generic_mask_map(unmasked_pixels_photon, photon_mask_map)
-    if data_type =="log_realiz":
-        rand_photon = tr.Catalog(ra=proper_rand_ras_photon, dec=proper_rand_decs_photon, ra_units='radians', dec_units='radians')
-    else:
-        rand_photon = tr.Catalog(ra=proper_rand_ras_photon, dec=proper_rand_decs_photon, w=proper_rand_weights_photon, ra_units='radians', dec_units='radians')
+    rand_photon = tr.Catalog(ra=proper_rand_ras_photon, dec=proper_rand_decs_photon, w=proper_rand_weights_photon, ra_units='radians', dec_units='radians')
 
 
 
     dd_photon_galaxy = tr.NNCorrelation(min_sep=5.0, max_sep=600.0, nbins=12, sep_units='arcminutes')#, bin_slop=0.01)
     dd_photon_galaxy.process(cat_photon, cat_galaxy)
+
+
+
     dr_photon_galaxy = tr.NNCorrelation(min_sep=5.0, max_sep=600.0, nbins=12, sep_units='arcminutes')#, bin_slop=0.01)
     dr_photon_galaxy.process(cat_photon, rand_galaxy)
+
+
+
     rd_photon_galaxy = tr.NNCorrelation(min_sep=5.0, max_sep=600.0, nbins=12, sep_units='arcminutes')#, bin_slop=0.01)
     rd_photon_galaxy.process(rand_photon, cat_galaxy)
+
+
+
     rr_photon_galaxy = tr.NNCorrelation(min_sep=5.0, max_sep=600.0, nbins=12, sep_units='arcminutes')#, bin_slop=0.01)
     rr_photon_galaxy.process(rand_photon, rand_galaxy)
+
+
 
     xi, varxi = dd_photon_galaxy.calculateXi(rr_photon_galaxy, dr_photon_galaxy, rd_photon_galaxy)
     r = np.exp(dd_photon_galaxy.meanlogr)
@@ -269,4 +270,4 @@ for zmin, zmax in zip(zmins,zmaxs):
     print(r.tolist())
     print("xi as a list: ")
     print(xi.tolist())
-    np.save("{0}/xi.npy".format(core_directory), xi)
+    np.save("{0}/xi_seed_{1}.npy".format(core_directory, random_seed), xi)
