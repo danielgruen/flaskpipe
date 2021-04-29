@@ -148,23 +148,24 @@ def get_ras_and_decs_and_weights_given_nonzero_or_unmasked_pixels_generic_and_ge
 
 
 
-def generate_lognormal_galaxy_catalogues(zmin, zmax, fz_delineation, hdu_data_table, sum_of_pixel_mask_values, lognormal_mask, core_directory):
+def generate_lognormal_galaxy_catalogues(zmin, zmax, fz_delineation, hdu_data_table, sum_of_pixel_mask_values, RM_galaxy_mask_map, core_directory):
 
-    ras = hdu_data_table['RA']
+    weights = hdu_data_table['weight']
     zs = hdu_data_table['ZREDMAGIC']
     new_ras_indices = np.where((zs > zmin) & (zs < zmax))[0]
-    number_of_galaxies = len(new_ras_indices)
+    weights =  weights[new_ras_indices]
+    number_of_galaxies = np.sum(weights)
     number_of_galaxies_per_unmasked_pixel = number_of_galaxies/sum_of_pixel_mask_values
+    RM_galaxy_mask_map = hp.ud_grade(RM_galaxy_mask_map, nside)
 
     smooth_galaxy_overdensity_map = hp.read_map("{0}/map-{1}.fits.gz".format(core_directory,fz_delineation))
     smooth_galaxy_overdensity_map = hp.ud_grade(smooth_galaxy_overdensity_map, nside)
     if np.any(smooth_galaxy_overdensity_map < -1.0):
         warnings.warn("Warning: smooth_galaxy_overdensity_map has values < -1.0. Setting these to -1.0 to prevent issues with the Poisson sampling")
         smooth_galaxy_overdensity_map = np.where(smooth_galaxy_overdensity_map >= -1.0, smooth_galaxy_overdensity_map, -1.0)
-    unsampled_galaxy_map = number_of_galaxies_per_unmasked_pixel * (smooth_galaxy_overdensity_map + 1.0) * lognormal_mask
+    unsampled_galaxy_map = number_of_galaxies_per_unmasked_pixel * (smooth_galaxy_overdensity_map + 1.0) * RM_galaxy_mask_map
 
     sampled_galaxy_map = np.random.poisson(unsampled_galaxy_map).astype(np.float)
-    sampled_galaxy_map = sampled_galaxy_map
     nonzero_pixels_galaxy = np.where(sampled_galaxy_map != 0.0)[0]
     ras, decs, weights = get_ras_and_decs_and_weights_given_nonzero_or_unmasked_pixels_generic_and_generic_map_or_generic_mask_map(nonzero_pixels_galaxy, sampled_galaxy_map, for_sampled_galaxies=True)
 
@@ -173,7 +174,7 @@ def generate_lognormal_galaxy_catalogues(zmin, zmax, fz_delineation, hdu_data_ta
 
 
 
-def generate_lognormal_gamma_ray_catalogues(Emin, Emax, fz_delineation, gamma_ray_map_unmasked_directory, gamma_ray_mask_map_directory, exposure_map_directory, lognormal_mask, core_directory, nside):
+def generate_lognormal_gamma_ray_catalogues(Emin, Emax, fz_delineation, gamma_ray_map_unmasked_directory, gamma_ray_mask_map_directory, exposure_map_directory, core_directory, nside):
     
 
     gamma_ray_map_unmasked = hp.read_map("{0}/flux_9years_{1}_{2}_MeV_C.fits".format(gamma_ray_map_unmasked_directory, Emin,Emax)) 
@@ -193,13 +194,18 @@ def generate_lognormal_gamma_ray_catalogues(Emin, Emax, fz_delineation, gamma_ra
     if np.any(smooth_photon_overdensity_map < -1.0):
         warnings.warn("Warning: smooth_photon_overdensity_map has values < -1.0. Setting these to -1.0 to prevent issues with the Poisson sampling")
         smooth_photon_overdensity_map = np.where(smooth_photon_overdensity_map >= -1.0, smooth_photon_overdensity_map, -1.0)
-    unsampled_photon_map = number_of_photons_per_unmasked_pixel * (smooth_photon_overdensity_map + 1.0) * lognormal_mask
+    unsampled_photon_map = number_of_photons_per_unmasked_pixel * (smooth_photon_overdensity_map + 1.0) * gamma_ray_mask_map
 
 
     sampled_photon_map = np.random.poisson(unsampled_photon_map).astype(np.float)
     sampled_gamma_ray_map = sampled_photon_map / exposure_map
-    
-    hp.write_map("{0}/sampled_gamma_ray_map_{1}_{2}_MeV".format(core_directory, Emin, Emax), sampled_gamma_ray_map)
+    nonzero_pixels_gamma_ray = np.where(sampled_gamma_ray_map != 0.0)[0]
+    ras, decs, weights = get_ras_and_decs_and_weights_given_nonzero_or_unmasked_pixels_generic_and_generic_map_or_generic_mask_map(nonzero_pixels_gamma_ray, sampled_gamma_ray_map)
+
+    np.save("{0}/gamma_ray_sampled_ras_z_{1}_{2}.npy".format(core_directory, zmin, zmax), ras)
+    np.save("{0}/gamma_ray_sampled_decs_z_{1}_{2}.npy".format(core_directory, zmin, zmax), decs)
+    np.save("{0}/gamma_ray_sampled_weights_z_{1}_{2}.npy".format(core_directory, zmin, zmax), weights)
+
 
 
 
@@ -236,6 +242,7 @@ RM_galaxy_mask_map = np.zeros(hp.nside2npix(nside_for_galaxy_mask_map))
 for index in list(range(0,len(hdu[1].data["HPIX"]))):
     unmasked_pixel = hdu[1].data["HPIX"][index]
     RM_galaxy_mask_map[unmasked_pixel] = hdu[1].data["FRACGOOD"][index]
+RM_galaxy_mask_map = np.around(RM_galaxy_mask_map)
 RM_galaxy_mask_map = hp.ud_grade(RM_galaxy_mask_map, nside)
 sum_of_pixel_mask_values = np.sum(RM_galaxy_mask_map)
 #print(sum_of_pixel_mask_values)
@@ -246,7 +253,7 @@ hdu_data_table = hdu[1].data
 #zmaxs = [0.35, 0.5, 0.65, 0.8, 0.9]
 fz_delineations = ["f1z1", "f2z2", "f3z3", "f4z4", "f5z5"]
 for zmin, zmax, fz_delineation in zip(zmins, zmaxs, fz_delineations):
-    generate_lognormal_galaxy_catalogues(zmin, zmax, fz_delineation, hdu_data_table, sum_of_pixel_mask_values, lognormal_mask, core_directory)
+    generate_lognormal_galaxy_catalogues(zmin, zmax, fz_delineation, hdu_data_table, sum_of_pixel_mask_values, RM_galaxy_mask_map, core_directory)
 
 
 
@@ -254,7 +261,7 @@ for zmin, zmax, fz_delineation in zip(zmins, zmaxs, fz_delineations):
 #Emaxs = [1202.3, 2290.9, 4786.3, 9120.1, 17378.0, 36307.8, 69183.1, 131825.7, 1000000.0]
 fz_delineations = ["f6z1", "f6z2", "f6z3", "f6z4", "f6z5", "f6z6", "f6z7", "f6z8", "f6z9"]
 for Emin, Emax, fz_delineation in zip(Emins, Emaxs, fz_delineations):
-    generate_lognormal_gamma_ray_catalogues(Emin, Emax, fz_delineation, gamma_ray_map_unmasked_directory, gamma_ray_mask_map_directory, exposure_map_directory, lognormal_mask, core_directory, nside)
+    generate_lognormal_gamma_ray_catalogues(Emin, Emax, fz_delineation, gamma_ray_map_unmasked_directory, gamma_ray_mask_map_directory, exposure_map_directory, core_directory, nside)
 
 
 

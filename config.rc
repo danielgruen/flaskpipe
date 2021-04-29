@@ -14,18 +14,23 @@ WORK=/nfs/slac/kipac/fs1/g/des/aresh/Gamma_Ray_x_DES/notebook_scripts_and_output
 RUN=sdss
 
 # NSIDE of mask and output maps; also max ell
-NSIDE=4096 # quick job for testing
+NSIDE=1024 # quick job for testing
 #LMAX=9999  # maximum ell in input tables (should be >=NSIDE)
-LMAX=4999  # maximum ell in input tables (should be >=NSIDE)
+#LMAX=4999  # maximum ell in input tables (should be >=NSIDE)
+#LMAX=1076  # maximum ell in input tables (should be >=NSIDE)
+LMAX=1032  # maximum ell in input tables (should be >=NSIDE)
+#LMAX=50  # maximum ell in input tables (should be >=NSIDE)
 
 # path to flask executable
-FLASK=/u/ki/dgruen/flask/bin/flask
+#FLASK=/u/ki/dgruen/flask/bin/flask
+FLASK=/nfs/slac/g/ki/ki19/des/aresh/Old_Stuff/Code_Depository/flask_folder/flask/bin/flask
 
 # path to trough lenser executable
 TROUGHLENSER=/nfs/slac/g/ki/ki23/des/dgruen/trough_lenser/trough_flask_input
 
 # path to python
 PYTHON=/nfs/slac/g/ki/ki19/des/aresh/Old_Stuff/Code_Depository/folder_for_miniconda3/bin/python
+#PYTHON=/u/ki/dgruen/anaconda2/bin/python
 
 # directory to save results in in the end (will be in subdirectories $RUN_$ID)
 SAVEDIR=/nfs/slac/kipac/fs1/g/des/aresh/Gamma_Ray_x_DES/notebook_scripts_and_outputs/using_raw_data/cross/for_all_z_and_E_bins_new_foreground_subtraction/flask_directory/stefano_cls/flaskpipe/output

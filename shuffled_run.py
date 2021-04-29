@@ -162,7 +162,7 @@ def find_directory_for_this_file_and_the_name_of_this_file_without_the_extension
 super_core_directory, program_name_no_extension = find_directory_for_this_file_and_the_name_of_this_file_without_the_extension()
 
 for zmin, zmax in zip(zmins,zmaxs):
-    hdu = fits.open("{0}/5bins_hidens_hilum_higherlum_jointmask_0.15-0.9_magauto_mof_combo_removedupes_spt_fwhmi_exptimei_cut_badpix_sample_weighted2sig.fits".format(galaxy_catalog_filename))
+    hdu = fits.open(galaxy_catalog_filename)
 
     ras = hdu[1].data['RA']
     decs = hdu[1].data['DEC']
@@ -270,4 +270,5 @@ for zmin, zmax in zip(zmins,zmaxs):
     print(r.tolist())
     print("xi as a list: ")
     print(xi.tolist())
-    np.save("{0}/xi_seed_{1}.npy".format(core_directory, random_seed), xi)
+    os.system("mkdir {0}/shuffled_new_foreground_subtraction")
+    np.save("{0}/shuffled_new_foreground_subtraction/xi_seed_{1}.npy".format(core_directory, random_seed), xi)

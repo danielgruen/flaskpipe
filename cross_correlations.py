@@ -168,7 +168,7 @@ for zmin, zmax in zip(zmins,zmaxs):
         decs = np.load("{0}/../sampled_decs_z_{1}_{2}.npy".format(super_core_directory, zmin, zmax))
         weights = np.ones(len(ras))
     else:
-        hdu = fits.open("{0}/5bins_hidens_hilum_higherlum_jointmask_0.15-0.9_magauto_mof_combo_removedupes_spt_fwhmi_exptimei_cut_badpix_sample_weighted2sig.fits".format(galaxy_catalog_filename))
+        hdu = fits.open(galaxy_catalog_filename)
 
         ras = hdu[1].data['RA']
         decs = hdu[1].data['DEC']
@@ -187,14 +187,11 @@ for zmin, zmax in zip(zmins,zmaxs):
 
 
     core_directory = super_core_directory + "/z_{0}_{1}".format(zmin,zmax)
-    if data_type =="log_realiz":
-        RM_galaxy_mask_map = hp.read_map("{0}/../../../mask_sdss_sum.fits.gz".format(super_core_directory))
-    else:
-        hdu = fits.open("{0}/5bins_hidens_hilum_higherlum_jointmask_0.15-0.9_magauto_mof_combo_removedupes_spt_fwhmi_exptimei_cut_badpix_mask.fits".format(galaxy_mask_map_directory))
-        RM_galaxy_mask_map = np.zeros(hp.nside2npix(nside_for_galaxy_mask_map))
-        for index in list(range(0,len(hdu[1].data["HPIX"]))):
-            unmasked_pixel = hdu[1].data["HPIX"][index]
-            RM_galaxy_mask_map[unmasked_pixel] = hdu[1].data["FRACGOOD"][index]
+    hdu = fits.open(galaxy_mask_filename)
+    RM_galaxy_mask_map = np.zeros(hp.nside2npix(nside_for_galaxy_mask_map))
+    for index in list(range(0,len(hdu[1].data["HPIX"]))):
+        unmasked_pixel = hdu[1].data["HPIX"][index]
+        RM_galaxy_mask_map[unmasked_pixel] = hdu[1].data["FRACGOOD"][index]
 
     unmasked_pixels = np.where(RM_galaxy_mask_map != 0.0)[0]
 
@@ -203,8 +200,12 @@ for zmin, zmax in zip(zmins,zmaxs):
     dec_min = - np.pi/2.0
     dec_max = np.pi/2.0
 
-    ras_of_pixels = np.random.uniform(ra_min, ra_max, len(ras)*60)       
-    sindecs_of_pixels = np.random.uniform(np.sin(dec_min), np.sin(dec_max), len(ras)*60)
+    if data_type =="log_realiz":
+        ras_of_pixels = np.random.uniform(ra_min, ra_max, len(ras))       
+        sindecs_of_pixels = np.random.uniform(np.sin(dec_min), np.sin(dec_max), len(ras))
+    else:
+        ras_of_pixels = np.random.uniform(ra_min, ra_max, len(ras)*60)
+        sindecs_of_pixels = np.random.uniform(np.sin(dec_min), np.sin(dec_max), len(ras)*60)
     decs_of_pixels = np.arcsin(sindecs_of_pixels)
 
     phis_of_pixels = ras_of_pixels
@@ -219,32 +220,29 @@ for zmin, zmax in zip(zmins,zmaxs):
 
 
 
-    if data_type =="log_realiz":
-        photon_map_unmasked = hp.read_map("{0}/../sampled_gamma_ray_map_{1}_{2}_MeV.fits".format(super_core_directory, Emin, Emax))
+    if data_type == "log_realiz":
+        proper_cat_ras_photon = np.load("{0}/../gamma_ray_sampled_ras_z_{1}_{2}.npy".format(super_core_directory, zmin, zmax))
+        proper_cat_decs_photon = np.load("{0}/../gamma_ray_sampled_decs_z_{1}_{2}.npy".format(super_core_directory, zmin, zmax))
+        proper_cat_weights_photon = np.load("{0}/../gamma_ray_sampled_weights_z_{1}_{2}.npy".format(super_core_directory, zmin, zmax))
+        photon_mask_map_high_res = hp.read_map("{0}/mask_GP30.0_sources_variable_FL8Y_incl_3FHL_incl_{1}_{2}_MeV_hpx_ord10.fits".format(gamma_ray_mask_map_directory, Emin, Emax))
     else:
         photon_map_unmasked = hp.read_map("{0}/flux_9years_{1}_{2}_MeV_C.fits".format(gamma_ray_map_unmasked_directory, Emin, Emax))
-    if data_type =="log_realiz":
-        photon_mask_map_high_res = copy.deepcopy(RM_galaxy_mask_map)
-    else:
         photon_mask_map_high_res = hp.read_map("{0}/mask_GP30.0_sources_variable_FL8Y_incl_3FHL_incl_{1}_{2}_MeV_hpx_ord10.fits".format(gamma_ray_mask_map_directory, Emin, Emax))
-    photon_map_high_res = photon_map_unmasked * hp.ud_grade(photon_mask_map_high_res, hp.npix2nside(len(photon_map_unmasked)))
-    photon_map = hp.ud_grade(photon_map_high_res, nside)
+        photon_map_high_res = photon_map_unmasked * hp.ud_grade(photon_mask_map_high_res, hp.npix2nside(len(photon_map_unmasked)))
+        photon_map = hp.ud_grade(photon_map_high_res, nside)
     photon_mask_map = hp.ud_grade(photon_mask_map_high_res, nside)
 
 
-
-    nonzero_pixels_photon = np.where(photon_map != 0.0)[0]
-    proper_cat_ras_photon, proper_cat_decs_photon, proper_cat_weights_photon = get_ras_and_decs_and_weights_given_nonzero_or_unmasked_pixels_generic_and_generic_map_or_generic_mask_map(nonzero_pixels_photon, photon_map)
+    if data_type != "log_realiz":
+        nonzero_pixels_photon = np.where(photon_map != 0.0)[0]
+        proper_cat_ras_photon, proper_cat_decs_photon, proper_cat_weights_photon = get_ras_and_decs_and_weights_given_nonzero_or_unmasked_pixels_generic_and_generic_map_or_generic_mask_map(nonzero_pixels_photon, photon_map)
     cat_photon = tr.Catalog(ra=proper_cat_ras_photon, dec=proper_cat_decs_photon, w=proper_cat_weights_photon, ra_units='radians', dec_units='radians')
 
 
 
     unmasked_pixels_photon = np.where(photon_mask_map != 0.0)[0]
     proper_rand_ras_photon, proper_rand_decs_photon, proper_rand_weights_photon = get_ras_and_decs_and_weights_given_nonzero_or_unmasked_pixels_generic_and_generic_map_or_generic_mask_map(unmasked_pixels_photon, photon_mask_map)
-    if data_type =="log_realiz":
-        rand_photon = tr.Catalog(ra=proper_rand_ras_photon, dec=proper_rand_decs_photon, ra_units='radians', dec_units='radians')
-    else:
-        rand_photon = tr.Catalog(ra=proper_rand_ras_photon, dec=proper_rand_decs_photon, w=proper_rand_weights_photon, ra_units='radians', dec_units='radians')
+    rand_photon = tr.Catalog(ra=proper_rand_ras_photon, dec=proper_rand_decs_photon, w=proper_rand_weights_photon, ra_units='radians', dec_units='radians')
 
 
 

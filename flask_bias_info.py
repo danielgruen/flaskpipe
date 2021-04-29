@@ -1,5 +1,6 @@
 import numpy
 import sys
+import copy
 
 if(len(sys.argv)<4):
   print("syntax:",sys.argv[0],"[FLASK info infile] [bias, one for each galaxy/matter field] [outfile]")
@@ -34,4 +35,22 @@ print("t: {}".format(t))
 #   bi+=1
 #   print(f)
 
-numpy.savetxt(sys.argv[-1],t,fmt='%i    %i   %f   %f   %i   %f    %f   ')
+
+#print("sys.argv[-1]: {0}".format(sys.argv[-1]))
+#print("t: {0}".format(t))
+#print("type(t): {0}".format(type(t)))
+#print("numpy.shape(t): {0}".format(numpy.shape(t)))
+#new_t = []
+#for i in [0,1,2,3,4,5,6]:
+#    new_t.append(t[i])
+#t = np.array(new_t)
+#t = numpy.array(t.tolist())
+#print("t: {0}".format(t))
+#print("")
+#print("")
+try:
+  numpy.savetxt(sys.argv[-1],t,fmt='%i    %i   %f   %f   %i   %f    %f   ')
+except:
+  f1_copy = str(copy.deepcopy(t)).split(", ")
+  f1 = numpy.array([[f1_copy[0].split("(")[1], f1_copy[1], f1_copy[2], f1_copy[3], f1_copy[4], f1_copy[5], f1_copy[6]]])
+  numpy.savetxt(sys.argv[-1],f1,fmt='%i    %i   %f   %f   %i   %f    %f   ')

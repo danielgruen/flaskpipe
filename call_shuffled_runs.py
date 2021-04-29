@@ -28,19 +28,15 @@ parser = argparse.ArgumentParser()
 parser = argparse.ArgumentParser()
 parser.add_argument('--nside')
 parser.add_argument('--nside_for_galaxy_mask_map')
-parser.add_argument('--bin_edges_filename')
-parser.add_argument('--Emin')
-parser.add_argument('--Emax')
-parser.add_argument('--galaxy_catalog_filename')
-parser.add_argument('--galaxy_mask_filename')
-parser.add_argument('--gamma_ray_map_unmasked_directory')
-parser.add_argument('--gamma_ray_mask_map_directory')
+parser.add_argument('--bin_edges_filename', default = "/nfs/slac/kipac/fs1/g/des/aresh/Gamma_Ray_x_DES/notebook_scripts_and_outputs/using_raw_data/cross/for_all_z_and_E_bins_new_foreground_subtraction/flask_directory/stefano_cls/flaskpipe/bin_edges.npy")
+parser.add_argument('--galaxy_catalog_filename', default = "/nfs/slac/kipac/fs1/g/des/aresh/Gamma_Ray_x_DES/redMaGiC_Maps_from_redmine/5bins_hidens_hilum_higherlum_jointmask_0.15-0.9_magauto_mof_combo_removedupes_spt_fwhmi_exptimei_cut_badpix_sample_weighted2sig.fits")
+parser.add_argument('--galaxy_mask_filename', default = "/nfs/slac/kipac/fs1/g/des/aresh/Gamma_Ray_x_DES/redMaGiC_Maps_from_redmine/5bins_hidens_hilum_higherlum_jointmask_0.15-0.9_magauto_mof_combo_removedupes_spt_fwhmi_exptimei_cut_badpix_mask.fits")
+parser.add_argument('--gamma_ray_map_unmasked_directory', default = "/nfs/slac/kipac/fs1/g/des/aresh/Gamma_Ray_x_DES/raw_photon_exposure_and_foreground_data/flux_9years_foresub")
+parser.add_argument('--gamma_ray_mask_map_directory', default = "/nfs/slac/kipac/fs1/g/des/aresh/Gamma_Ray_x_DES/raw_photon_exposure_and_foreground_data/masks")
 options = parser.parse_args()
 nside = int(options.nside)
 nside_for_galaxy_mask_map = int(options.nside_for_galaxy_mask_map)
 bin_edges_filename = options.bin_edges_filename
-Emin = options.Emin
-Emax = options.Emax
 galaxy_catalog_filename = options.galaxy_catalog_filename
 galaxy_mask_filename = options.galaxy_mask_filename
 gamma_ray_map_unmasked_directory = options.gamma_ray_map_unmasked_directory
@@ -48,8 +44,6 @@ gamma_ray_mask_map_directory = options.gamma_ray_mask_map_directory
 print("nside: {0}".format(nside))
 print("nside_for_galaxy_mask_map: {0}".format(nside_for_galaxy_mask_map))
 print("bin_edges_filename: {0}".format(bin_edges_filename))
-print("Emin: {0}".format(Emin))
-print("Emax: {0}".format(Emax))
 print("galaxy_catalog_filename: {0}".format(galaxy_catalog_filename))
 print("galaxy_mask_filename: {0}".format(galaxy_mask_filename))
 print("gamma_ray_map_unmasked_directory: {0}".format(gamma_ray_map_unmasked_directory))
@@ -61,6 +55,16 @@ def find_directory_for_this_file_and_the_name_of_this_file_without_the_extension
     core_directory = file_path.split("/{0}".format(program_name))[0]
     program_name_no_extension = program_name.split(".")[0]
     return core_directory, program_name_no_extension
+
+def find_Emin_and_Emax_given_core_directory(core_directory):
+    energy_range = core_directory.split("new_foreground_subtraction_")[-1]
+    Emin = energy_range.split("_")[0]
+    Emax = energy_range.split("_")[1]
+    return Emin, Emax
+
+core_directory, program_name_no_extension = find_directory_for_this_file_and_the_name_of_this_file_without_the_extension()
+
+Emin, Emax = find_Emin_and_Emax_given_core_directory(core_directory)
 
 
 
